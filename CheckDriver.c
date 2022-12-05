@@ -1,4 +1,3 @@
-#include <winternl.h>
 #include <ntddk.h>
 
 void print_to_debugger()
@@ -6,25 +5,10 @@ void print_to_debugger()
 	DbgPrint("Hello from the kernel :)\nWith great power comes great responsibility!\n");
 }
 
-void list_all_procs()
-{
-	SYSTEM_PROCESS_INFORMATION s[100];
-	NTSTATUS status = NtQuerySystemInformation(SystemProcessInformation, &s, sizeof(SYSTEM_PROCESS_INFORMATION) * 100, NULL);
+//void hide_process(int pid)
+//{
 	
-	if (status != STATUS_SUCCESS)
-	{
-		DbgPrint("This whole operation is a failue, status: (0x%08X)\n", status);
-		return;
-	}
-
-	for (int i = 0; i < 100; i++)
-	{
-		if (!s->NextEntryOffset)
-			break;
-
-		DbgPrint("Process %d with name %s", s->UniqueProcessId, s->ImageName);
-	}
-}
+//}
 
 VOID DriverUnload(PDRIVER_OBJECT DriverObject) {
 	// delete device object
@@ -55,6 +39,10 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
 	}
 
 	print_to_debugger();
+	PEPROCESS p = IoGetCurrentProcess();
+	HANDLE pid = PsGetProcessId(p);
+	DbgPrint("%d\n", pid);
+	//hide_process(pid);
 
 	return STATUS_SUCCESS;
 }
